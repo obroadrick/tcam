@@ -18,8 +18,8 @@ def compare_two(hotel_ids, room_ids):
     save(hotel_ids, room_ids, stitched_image, n_smallest)
 
 def save(hotel_ids, room_ids, stitched_image, n_smallest):
-    fn = str(hotel_ids[0])+'_'+str(room_ids[0]) +'_'+str(hotel_ids[1])+'_'+str(room_ids[1])+'.png'
-    dir = '.' + os.path.basename(fn).replace('.png', '')
+    fn = str(hotel_ids[0])+'_'+str(room_ids[0]) +'_'+str(hotel_ids[1])+'_'+str(room_ids[1])
+    dir = '.' + os.path.basename(fn)
     create_dirs(dir)
 
     save_image(dir, fn, stitched_image)

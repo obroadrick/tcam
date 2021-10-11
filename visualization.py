@@ -25,16 +25,14 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     # find closest from each  h1 to closest in h2
     n_smallest = closest_vector_handler(h1, h2, 10)
 
-    # visualize
-    i1, i2 = visualize(i1, i2, n_smallest)
-
     # stitch images together, updating the n_smallest coordinates
-    stitched_image, n_smallest_stiched = stitch_images(i1, i2, n_smallest)
+    stitched_image, n_smallest = stitch_images(i1, i2, n_smallest)
 
-    # check to see if the updated points are correct by drawing things there and checking that they're in the same spots as circles
-    sanity_check(stitched_image, n_smallest_stiched)
+    # Draw points in pairs with random matching colors.
+    image = draw_points(stitched_image, n_smallest)
 
-    # TODO using updated coordinates, draw lines between corresponding nclosest points
+    # Draw lines between matching points.
+    image = draw_lines(image, n_smallest)
 
     # save
     return stitched_image, n_smallest
@@ -42,29 +40,13 @@ def closest_n_vectors(h1, h2, i1, i2, n):
 def closest_same_closest_diff(same_hotels, same_rooms, diff_hotels, diff_rooms):
     pass
 
-def visualize(i1, i2, n_smallest):
-    draw1 = ImageDraw.Draw(i1)
-    draw2 = ImageDraw.Draw(i2)
-
-    r = 3
-    for s in n_smallest:
-        point1, point2 = s[1][:2], s[2][:2]
-        color = (randint(0, 255), randint(0,255), randint(0,255))
-        circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
-        circle2 = (point2[0]-r, point2[1]-r, point2[0]+r, point2[1]+r)
-
-        draw1.ellipse(circle1, fill=color)
-        draw2.ellipse(circle2, fill=color)
-
-    return i1, i2
-
-def sanity_check(stitched_image, n_smallest_stitched):
+def draw_points(stitched_image, n_smallest_stitched):
     draw = ImageDraw.Draw(stitched_image)
 
-    r = 1
+    r = 5
     for s in n_smallest_stitched:
         point1, point2 = s[1][:2], s[2][:2]
-        color = (0,0,0)
+        color = (randint(0, 255), randint(0,255), randint(0,255))
         circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
         circle2 = (point2[0]-r, point2[1]-r, point2[0]+r, point2[1]+r)
 
@@ -73,6 +55,15 @@ def sanity_check(stitched_image, n_smallest_stitched):
 
     return stitched_image
 
+def draw_lines(image, n_smallest):
+    draw = ImageDraw.Draw(image)
+
+    for s in n_smallest:
+        point1, point2 = s[1][:2], s[2][:2]
+        color = (0,0,0)
+        draw.line((point1[0], point1[1], point2[0], point2[1]), fill=color)
+
+    return image
 
 def closest_vector_handler(h1, h2,n):
     # heap? DS that may make it faster than sorting at end
