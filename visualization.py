@@ -18,24 +18,28 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     i1 = Image.open(i1)
     i2 = Image.open(i2)
 
-    # exclude points where radius is over border of image
+    # Exclude points where radius is over border of image.
     h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
         h1['xys'], h2['xys'], h1['desc'], h2['desc'], i1.size, i2.size)
 
-    # find closest from each  h1 to closest in h2
+    # Find closest from each  h1 to closest in h2.
     n_smallest = closest_vector_handler(h1, h2, 10)
 
-    # stitch images together, updating the n_smallest coordinates
-    stitched_image, n_smallest = stitch_images(i1, i2, n_smallest)
+    # Stitch images together, updating the n_smallest coordinates.
+    image, n_smallest = stitch_images(i1, i2, n_smallest)
+    print("Found {} nearest matching r2d2 points, excluding those along the image border".format(len(n_smallest)))
 
     # Draw points in pairs with random matching colors.
-    image, colors = draw_points(stitched_image, n_smallest)
+    image, colors = draw_points(image, n_smallest)
 
-    # Draw lines between matching points.
+    # Draw lines between matching points with same matching colors.
     image = draw_lines(image, n_smallest, colors)
 
-    # save
-    return stitched_image, n_smallest
+    # Draw circles with correct radius for each r2d2 point.
+    image = draw_circles(image, n_smallest, colors)
+
+    # Save.
+    return image, n_smallest
     
 def closest_same_closest_diff(same_hotels, same_rooms, diff_hotels, diff_rooms):
     pass
@@ -68,6 +72,25 @@ def draw_lines(image, n_smallest, colors):
         color = colors[i]
         point1, point2 = s[1][:2], s[2][:2]
         draw.line((point1[0], point1[1], point2[0], point2[1]), fill=color, width=3)
+
+    return image
+
+def draw_circles(image, n_smallest, colors):
+    draw = ImageDraw.Draw(image)
+
+    assert len(colors) == len(n_smallest)
+
+    for i in range(len(colors)):
+        s = n_smallest[i]
+        color = colors[i]
+
+        point1, point2 = s[1][:2], s[2][:2]
+        r1, r2 = s[1][2], s[2][2]
+        circle1 = (point1[0]-r1, point1[1]-r1 ,point1[0]+r1, point1[1]+r1)
+        circle2 = (point2[0]-r2, point2[1]-r2, point2[0]+r2, point2[1]+r2)
+
+        draw.ellipse(circle1, fill=None)
+        draw.ellipse(circle2, fill=None)
 
     return image
 
@@ -153,32 +176,32 @@ def stitch_images(image1, image2, nsmallest):
 
     # Resize the image with lesser height to match the other image (for viewing pleasure)
     if height1 < height2:
-        # We need to scale up image1
+        # We need to scale up image1.
         new_h = height2
         proportion = new_h / height1
         new_w = int(width1 * proportion)
         image1 = image1.resize((new_w,new_h))
         width1 = new_w
         height1 = new_h
-        # update coordinates for image 1 (first index 1 is to get the first im, second index 1 is to get y coord)
+        # Update coordinates for image1. 
+        # (first index 1 is to get the first im, second index 1 is to get y coord)
         for item in nsmallest_stiched:
             item[1][1] *= proportion
             item[1][0] *= proportion
     elif height2 < height1:
-        # We need to scale up image2
+        # We need to scale up image2.
         new_h = height1
         proportion = new_h / height2
         new_w = int(width2 * proportion)
-        image1.resize((new_w,new_h))
+        image2 = image2.resize((new_w,new_h))
         width2 = new_w
         height2 = new_h
-        # update coordinates for image 2
+        # Update coordinates for points in image 2.
         for item in nsmallest_stiched:
             item[2][1] *= proportion
             item[2][0] *= proportion
- 
 
-    # update x coordinates for image 2
+    # Update x coordinates for points in image2.
     for item in nsmallest_stiched:
         item[2][0] += width1
 

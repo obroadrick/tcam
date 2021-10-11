@@ -60,6 +60,10 @@ def main():
     hotel_ids = ['6268', '6268']
     room_ids = [7891968, 2618161]
     compare_two(hotel_ids, room_ids)
+    """
+    hotel_ids, room_ids = get_same_hotels()
+    compare_two(hotel_ids, room_ids)
+    """
     # getting a bunch of random same hotel comparisons
     # n = 1000
     # for i in range(n):
