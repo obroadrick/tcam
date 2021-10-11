@@ -85,7 +85,7 @@ def draw_circles(image, n_smallest, colors):
         color = colors[i]
 
         point1, point2 = s[1][:2], s[2][:2]
-        r1, r2 = s[1][2], s[2][2]
+        r1, r2 = s[1][2]/2, s[2][2]/2
         circle1 = (point1[0]-r1, point1[1]-r1 ,point1[0]+r1, point1[1]+r1)
         circle2 = (point2[0]-r2, point2[1]-r2, point2[0]+r2, point2[1]+r2)
 
