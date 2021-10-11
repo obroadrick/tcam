@@ -128,6 +128,24 @@ def stitch_images(image1, image2):
     (width1, height1) = image1.size
     (width2, height2) = image2.size
 
+    # Resize the image with lesser height to match the other image (for viewing pleasure)
+    if height1 < height2:
+        # We need to scale up image1
+        new_h = height2
+        proportion = new_h / height1
+        new_w = int(width1 * proportion)
+        image1 = image1.resize((new_w,new_h))
+        width1 = new_w
+        height1 = new_h
+    elif height2 < height1:
+        # We need to scale up image2
+        new_h = height1
+        proportion = new_h / height2
+        new_w = int(width2 * proportion)
+        image1.resize((new_w,new_h))
+        width2 = new_w
+        height2 = new_h
+
     result_width = width1 + width2
     result_height = max(height1, height2)
 
