@@ -7,6 +7,7 @@ from scipy.spatial.distance import cosine
 from tqdm import tqdm
 from random import randint
 from numba import njit, guvectorize, cuda, float64, config, prange
+import copy
 
 from util import create_dirs, save_image, save_to_csv
 
@@ -27,8 +28,13 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     # visualize
     i1, i2 = visualize(i1, i2, n_smallest)
 
-    # stitch images together
-    stitched_image = stitch_images(i1, i2)
+    # stitch images together, updating the n_smallest coordinates
+    stitched_image, n_smallest_stiched = stitch_images(i1, i2, n_smallest)
+
+    # check to see if the updated points are correct by drawing things there and checking that they're in the same spots as circles
+    sanity_check(stitched_image, n_smallest_stiched)
+
+    # TODO using updated coordinates, draw lines between corresponding nclosest points
 
     # save
     return stitched_image, n_smallest
@@ -51,6 +57,22 @@ def visualize(i1, i2, n_smallest):
         draw2.ellipse(circle2, fill=color)
 
     return i1, i2
+
+def sanity_check(stitched_image, n_smallest_stitched):
+    draw = ImageDraw.Draw(stitched_image)
+
+    r = 1
+    for s in n_smallest_stitched:
+        point1, point2 = s[1][:2], s[2][:2]
+        color = (0,0,0)
+        circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
+        circle2 = (point2[0]-r, point2[1]-r, point2[0]+r, point2[1]+r)
+
+        draw.ellipse(circle1, fill=color)
+        draw.ellipse(circle2, fill=color)
+
+    return stitched_image
+
 
 def closest_vector_handler(h1, h2,n):
     # heap? DS that may make it faster than sorting at end
@@ -123,10 +145,14 @@ def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
     desc2 = np.delete(desc2, indices_to_be_del_2, 0)
     return xys1, xys2,desc1, desc2
 
-
-def stitch_images(image1, image2):
+def stitch_images(image1, image2, nsmallest):
+    """
+    Resizes the image of smaller height to match the heights of the images.
+    Stitches the two images together, updating all the coordinates in h1 and h2.
+    """
     (width1, height1) = image1.size
     (width2, height2) = image2.size
+    nsmallest_stiched = copy.deepcopy(nsmallest)
 
     # Resize the image with lesser height to match the other image (for viewing pleasure)
     if height1 < height2:
@@ -137,6 +163,10 @@ def stitch_images(image1, image2):
         image1 = image1.resize((new_w,new_h))
         width1 = new_w
         height1 = new_h
+        # update coordinates for image 1 (first index 1 is to get the first im, second index 1 is to get y coord)
+        for item in nsmallest_stiched:
+            item[1][1] *= proportion
+            item[1][0] *= proportion
     elif height2 < height1:
         # We need to scale up image2
         new_h = height1
@@ -145,6 +175,15 @@ def stitch_images(image1, image2):
         image1.resize((new_w,new_h))
         width2 = new_w
         height2 = new_h
+        # update coordinates for image 2
+        for item in nsmallest_stiched:
+            item[2][1] *= proportion
+            item[2][0] *= proportion
+ 
+
+    # update x coordinates for image 2
+    for item in nsmallest_stiched:
+        item[2][0] += width1
 
     result_width = width1 + width2
     result_height = max(height1, height2)
@@ -152,4 +191,4 @@ def stitch_images(image1, image2):
     result = Image.new('RGB', (result_width, result_height))
     result.paste(im=image1, box=(0, 0))
     result.paste(im=image2, box=(width1, 0))
-    return result
+    return result, nsmallest_stiched
