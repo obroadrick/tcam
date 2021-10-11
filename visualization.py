@@ -29,10 +29,10 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     stitched_image, n_smallest = stitch_images(i1, i2, n_smallest)
 
     # Draw points in pairs with random matching colors.
-    image = draw_points(stitched_image, n_smallest)
+    image, colors = draw_points(stitched_image, n_smallest)
 
     # Draw lines between matching points.
-    image = draw_lines(image, n_smallest)
+    image = draw_lines(image, n_smallest, colors)
 
     # save
     return stitched_image, n_smallest
@@ -40,11 +40,12 @@ def closest_n_vectors(h1, h2, i1, i2, n):
 def closest_same_closest_diff(same_hotels, same_rooms, diff_hotels, diff_rooms):
     pass
 
-def draw_points(stitched_image, n_smallest_stitched):
-    draw = ImageDraw.Draw(stitched_image)
+def draw_points(image, n_smallest):
+    draw = ImageDraw.Draw(image)
 
     r = 5
-    for s in n_smallest_stitched:
+    colors = []
+    for s in n_smallest:
         point1, point2 = s[1][:2], s[2][:2]
         color = (randint(0, 255), randint(0,255), randint(0,255))
         circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
@@ -53,15 +54,20 @@ def draw_points(stitched_image, n_smallest_stitched):
         draw.ellipse(circle1, fill=color)
         draw.ellipse(circle2, fill=color)
 
-    return stitched_image
+        colors.append(color)
 
-def draw_lines(image, n_smallest):
+    return image, colors
+
+def draw_lines(image, n_smallest, colors):
     draw = ImageDraw.Draw(image)
 
-    for s in n_smallest:
+    assert len(colors) == len(n_smallest)
+
+    for i in range(len(colors)):
+        s = n_smallest[i]
+        color = colors[i]
         point1, point2 = s[1][:2], s[2][:2]
-        color = (0,0,0)
-        draw.line((point1[0], point1[1], point2[0], point2[1]), fill=color)
+        draw.line((point1[0], point1[1], point2[0], point2[1]), fill=color, width=3)
 
     return image
 
