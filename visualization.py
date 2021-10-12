@@ -151,11 +151,13 @@ def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
     indices_to_be_del_1 = []
     indices_to_be_del_2 = []
     for idx1, point1 in enumerate(xys1):
-        if point1[0]+point1[2] > size1[0] or point1[1]+point1[2] > size1[1] or point1[0]-point1[2] < 0 or point1[1]-point1[2] < 0:
+        radius = point1[2] / 2
+        if point1[0]+radius > size1[0] or point1[1]+radius > size1[1] or point1[0]-radius < 0 or point1[1]-radius < 0:
             if idx1 >= len(xys1): continue
             indices_to_be_del_1.append(idx1)
     for idx2, point2 in enumerate(xys2):
-        if point2[0]+point2[2] > size2[0] or point2[1]+point2[2] > size2[1] or point2[0]-point2[2] < 0 or point2[1]-point2[2] < 0:
+        radius = point2[2] / 2
+        if point2[0]+radius > size2[0] or point2[1]+radius > size2[1] or point2[0]-radius < 0 or point2[1]-radius < 0:
             if idx2 >= len(xys2): continue
             indices_to_be_del_2.append(idx2)
 
