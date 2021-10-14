@@ -6,40 +6,26 @@ import numpy as np
 import copy
 from PIL import Image, ImageDraw
 from random import randint
-from closeness_computations import closest_vector_handler, remove_overflow_points
 
-def closest_n_vectors(h1, h2, i1, i2, n):
-    """ 
-    Takes dicts for descriptions, points, scores (h1 and h2) and paths to 
-    images (i1 and i2) and n (how many closest vectors to consider),
-    and computes and draws on a new image a visualization of the pairs of points.
-    """
-    i1 = Image.open(i1)
-    i2 = Image.open(i2)
-
-    # Exclude points where radius is over border of image.
-    h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
-        h1['xys'], h2['xys'], h1['desc'], h2['desc'], i1.size, i2.size)
-
-    # Find closest from each  h1 to closest in h2.
-    n_smallest = closest_vector_handler(h1, h2, 10)
-
-    # Stitch images together, updating the n_smallest coordinates.
+def draw_closest_pairs_on_two_images(i1, i2, n_smallest, lines=True, circles=True):
+     # Stitch images together, updating the n_smallest coordinates.
     image, n_smallest = stitch_images(i1, i2, n_smallest)
     print("Found {} nearest matching r2d2 points, excluding those along the image border".format(len(n_smallest)))
 
     # Draw points in pairs with random matching colors.
     image, colors = draw_points(image, n_smallest)
 
-    # Draw lines between matching points with same matching colors.
-    image = draw_lines(image, n_smallest, colors)
+    if lines:
+        # Draw lines between matching points with same matching colors.
+        image = draw_lines(image, n_smallest, colors)
 
-    # Draw circles with correct radius for each r2d2 point.
-    image = draw_circles(image, n_smallest, colors)
-
-    # Save.
-    return image, n_smallest
+    if circles:
+        # Draw circles with correct radius for each r2d2 point.
+        image = draw_circles(image, n_smallest, colors)
     
+    # Return the stiched, drawn upon image
+    return image
+
 def closest_same_closest_diff(same_hotels, same_rooms, diff_hotels, diff_rooms):
     pass
 
