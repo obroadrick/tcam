@@ -15,6 +15,11 @@ cuda.select_device(1)
 config.THREADING_LAYER = 'threadsafe'
 
 def closest_n_vectors(h1, h2, i1, i2, n):
+    """ 
+    Takes dicts for descriptions, points, scores (h1 and h2) and paths to 
+    images (i1 and i2) and n (how many closest vectors to consider),
+    and computes and draws on a new image a visualization of the pairs of points.
+    """
     i1 = Image.open(i1)
     i2 = Image.open(i2)
 
@@ -95,6 +100,9 @@ def draw_circles(image, n_smallest, colors):
     return image
 
 def closest_vector_handler(h1, h2,n):
+    """
+    Computes and returns the n closest (by cosine distance) r2d2 points between h1 and h2.
+    """
     # heap? DS that may make it faster than sorting at end
     heap = []
     heapq.heapify(heap)
@@ -148,6 +156,11 @@ def closest(v1, M2, ans):
     ans[1] = closest_score
 
 def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
+    """
+    Removes 'overflow' points, those whose radius exceeds the boundaries of the image.
+
+    Useful because these points could artificially produce good matches since boundaries are similar.
+    """
     indices_to_be_del_1 = []
     indices_to_be_del_2 = []
     for idx1, point1 in enumerate(xys1):
