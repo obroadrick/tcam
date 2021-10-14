@@ -39,7 +39,7 @@ def compare_two(hotel_ids, room_ids):
     i1 = r2d2_features.get_path_to_image(hotel_ids[0], room_ids[0])
     i2 = r2d2_features.get_path_to_image(hotel_ids[1], room_ids[1])
 
-    stitched_image, n_smallest = closest_n_vectors(h1, h2, i1, i2, 100)
+    stitched_image, n_smallest = closest_n_vectors(h1, h2, i1, i2, 25)
 
     save(hotel_ids, room_ids, stitched_image, n_smallest)
 

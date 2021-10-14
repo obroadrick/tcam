@@ -8,7 +8,7 @@ import math
 import heapq
 from tqdm import tqdm
 
-def closest_vector_handler(h1, h2,n):
+def closest_vector_handler(h1, h2, n=.25):
     """
     Computes and returns the n closest (by cosine distance) r2d2 points between h1 and h2.
     """
@@ -34,7 +34,9 @@ def closest_vector_handler(h1, h2,n):
         if idx1 == pair_idx:
             heap.append( (score, h1['xys'][idx1], h2['xys'][idx]) )
 
-    return heapq.nsmallest(int(0.25* len(heap)), heap, key=lambda x: x[0])
+    if n > 0 and n < 1:
+        n = math.ceil(n * len(heap))
+    return heapq.nsmallest(n, heap, key=lambda x: x[0])
 
 @njit
 def norm(v):
