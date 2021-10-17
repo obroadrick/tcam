@@ -4,6 +4,7 @@ import pickle
 import os
 import csv
 
+from PIL import Image
 
 def open_pckl_5_file(file):
     with open(file, 'rb') as f:
@@ -14,6 +15,11 @@ def open_pckl_file(file):
     with open(file, 'rb') as f:
         file_data = pickle.load(f)
     return file_data
+
+def write_pckl_5_file(path, data):
+    create_dirs(os.path.dirname(path))
+    with open(path, 'wb') as f:
+        pickle5.dump(data, f)
 
 def load_dir(path):
     return list(glob.glob(path + "/*.*"))
@@ -34,3 +40,6 @@ def save_to_csv(path, fn, data):
 
 def save_image(path, fn, image):
     image.save(os.path.join(path, fn+ '.png'))
+
+def open_image(path):
+    return Image.open(path)

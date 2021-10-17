@@ -19,7 +19,7 @@ def closest_n_vectors(h1, h2, i1, i2, n):
 
     # Exclude points where radius is over border of image.
     h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
-        h1['xys'], h2['xys'], h1['desc'], h2['desc'], i1.size, i2.size)
+        h1['xys'], h1['desc'], i1.size, h2['xys'], h2['desc'], i2.size)
 
     # Find closest from each  h1 to closest in h2.
     n_smallest = closest_vector_handler(h1, h2, 10)
