@@ -143,3 +143,4 @@ cython_debug/
 
 __pycache__/
 __pycache__/util.cpython-37.pyc
+metadata.txt
