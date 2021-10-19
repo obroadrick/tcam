@@ -10,7 +10,7 @@ hotel_ids = R2D2_FEATS.get_hotel_ids()
 
 dir = './datasets/cleaned_0.1k/'
 
-for hotel in tqdm(hotel_ids):
+for hotel in tqdm(hotel_ids[240:]):
     feature_file = R2D2_FEATS.open_and_extract_feature_file(hotel_id=hotel)
 
     for key in list(feature_file.keys()):
