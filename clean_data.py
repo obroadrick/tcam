@@ -10,13 +10,13 @@ hotel_ids = R2D2_FEATS.get_hotel_ids()
 
 dir = './datasets/cleaned_0.1k/'
 
-for hotel in tqdm(hotel_ids[240:]):
+for hotel in tqdm(hotel_ids):
     feature_file = R2D2_FEATS.open_and_extract_feature_file(hotel_id=hotel)
 
     for key in list(feature_file.keys()):
         xys, desc, score = feature_file[key]['xys'],feature_file[key]['desc'],feature_file[key]['scores']
         i1 = open_image(R2D2_FEATS.get_path_to_image(str(hotel),key))
-        feature_file[key]['xys'], feature_file[key]['desc'], _, _ = remove_overflow_points(xys, desc, i1.size)
+        feature_file[key]['xys'], _, feature_file[key]['desc'], _ =  remove_overflow_points(xys, desc, i1.size)
      
     full_path = os.path.join(dir, str(hotel)+'.pckl')
     write_pckl_5_file(full_path,feature_file)

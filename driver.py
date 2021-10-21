@@ -18,15 +18,15 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     i2 = Image.open(i2)
 
     # Exclude points where radius is over border of image.
-    h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
-        h1['xys'], h1['desc'], i1.size, h2['xys'], h2['desc'], i2.size)
+    # h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
+    #     h1['xys'], h1['desc'], i1.size, h2['xys'], h2['desc'], i2.size)
 
     # Find closest from each  h1 to closest in h2.
     n_smallest = closest_vector_handler(h1, h2, 10)
 
     # Draw a nice picture of these results
-    lines = True
-    circles = True
+    lines = False
+    circles = False
     image = draw_closest_pairs_on_two_images(i1, i2, n_smallest, lines, circles)
 
     # Save.
@@ -45,7 +45,7 @@ def compare_two(hotel_ids, room_ids):
 
 def save(hotel_ids, room_ids, stitched_image, n_smallest):
     fn = str(hotel_ids[0])+'_'+str(room_ids[0]) +'_'+str(hotel_ids[1])+'_'+str(room_ids[1])
-    dir = '.' + os.path.basename(fn)
+    dir = '.' + os.path.basename(fn+'edge points')
     create_dirs(dir)
 
     save_image(dir, fn, stitched_image)
@@ -91,7 +91,7 @@ def main():
     compare_two(hotel_ids, room_ids)
     """
     # getting a bunch of random same hotel comparisons
-    # n = 1000
+    # n = 10
     # for i in range(n):
     #     try:
     #         hotel_ids, room_ids = get_same_hotels()
