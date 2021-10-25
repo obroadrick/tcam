@@ -1,21 +1,34 @@
+import argparse
 import random
-import math
+from random import sample
+
 from calculate_metadata import get_data
 from util import open_pckl_file, write_pckl_5_file
-from random import sample
 
 random.seed(42)
 
-r2d2 = open_pckl_file('./r2d2_features.pckl')
+def main(factor):
+    r2d2 = open_pckl_file('./r2d2_features.pckl')
+    hids = r2d2.get_hotel_ids()
+    _, __, total = get_data(hids, r2d2)
 
-hids = r2d2.get_hotel_ids()
-min_num, max_num, total = get_data(hids, r2d2)
+    new_rooms = {}
+    for h in hids:
+        rids = r2d2.get_room_ids(h)
 
-new_rooms = {}
-factor = 2
-for h in hids:
-    rids = r2d2.get_room_ids(h)
-    new_rooms[h] = random.sample(rids, len(rids) // factor)
+        sample_number = len(rids) // factor
 
-write_pckl_5_file('./sampled_data.pckl', new_rooms)
-print(total, sum([len(i) for i in new_rooms.values()]))
+        sample_number = max(min(len(rids), 10), sample_number)
+
+        new_rooms[h] = sample(rids, sample_number)
+
+    write_pckl_5_file('./datasets/0.1k/sampled_hotels/sampled_data_{}_factor.pckl'.format(factor), new_rooms)
+    print(total, sum([len(i) for i in new_rooms.values()]))
+    print("Compression Ratio: {}".format(total / sum([len(i) for i in new_rooms.values()])))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', type=str, required=True)
+    args = parser.parse_args()
+    factor = int(args.f)
+    main(factor=factor)
