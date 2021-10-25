@@ -1,10 +1,8 @@
+from os import write
 from tqdm import tqdm
 from util import open_pckl_file
-from numba import jit
-import logging 
-
-def get_data(h_ids):
-    min_num = 0
+def get_data(h_ids, r2d2=None):
+    min_num = float('inf')
     max_num = 0
     total = 0
 
@@ -16,11 +14,13 @@ def get_data(h_ids):
     return min_num, max_num, total
 
 if __name__ =='__main__':
-    logging.basicConfig(filename='./metadata.txt')
-
+    filename='./metadata.txt'
+    print('Starting Computations')
     r2d2 = open_pckl_file('./r2d2_features.pckl')
 
     h_ids = r2d2.get_hotel_ids()
     min_num, max_num, total = get_data(h_ids)
-    message = "total={}\nmin={}\nmax={}\navg=".format(total, min_num, max_num, total/len(h_ids))
-    logging.info(message)
+    message = "total={}\nmin={}\nmax={}\navg={}".format(total, min_num, max_num, total/len(h_ids))
+    print(message)
+    with open(filename, 'w+') as f:
+        f.write(message)
