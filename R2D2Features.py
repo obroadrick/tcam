@@ -1,6 +1,7 @@
 import os
+import argparse
 import re
-from util import load_dir, open_pckl_5_file
+from util import load_dir, open_pckl_5_file, write_pckl_file
 
 
 class R2D2Features:
@@ -50,9 +51,23 @@ class R2D2Features:
         return path_to_image
 
 
+def main(path, h2i, h_info, save_path, fn):
+    r2d2_features = R2D2Features(path, h2i, h_info)
+    write_pckl_file(os.path.join(save_path, fn), r2d2_features)
+    
 if __name__ == '__main__':
-    features_path = "/pless_nfs/home/datasets/tcam_local_features/small"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', type=str, required=True)
+    parser.add_argument('-s', type=str, required=True)
+    parser.add_argument('--fn', type=str, required=True)
+
+    args = parser.parse_args()
+
+    features_path = args.p
     h2i_path = './tcam_for_gwu/hotel2img_dict.pkl'
     h_info_path = './tcam_for_gwu/hotelimageinfo.pkl'
 
-    r2d2_features = R2D2Features(features_path, h2i_path, h_info_path)
+    main(features_path, h2i_path, h_info_path, args.s, args.fn)
+    
+
+    

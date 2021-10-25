@@ -21,6 +21,11 @@ def write_pckl_5_file(path, data):
     with open(path, 'wb') as f:
         pickle5.dump(data, f)
 
+def write_pckl_file(path, data):
+    create_dirs(os.path.dirname(path))
+    with open(path, 'wb') as f:
+        pickle.dump(data, f)
+
 def load_dir(path):
     return list(glob.glob(path + "/*.*"))
 
