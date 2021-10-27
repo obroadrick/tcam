@@ -34,6 +34,11 @@ def closest_vector_handler(h1, h2,n):
         if idx1 == pair_idx:
             heap.append( (score, h1['xys'][idx1], h2['xys'][idx]) )
 
+    if n > 0 and n <= 1:
+        return heapq.nsmallest(int(n* len(heap)), heap, key=lambda x: x[0])
+    elif n >= 1:
+        return heapq.nsmallest(int(n), heap, key=lambda x: x[0])
+    # Defaults to .25 proportion
     return heapq.nsmallest(int(0.25* len(heap)), heap, key=lambda x: x[0])
 
 @njit
