@@ -1,6 +1,7 @@
 # Pickle files
 *.pckl
 *.pkl
+**/datasets
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -143,3 +144,5 @@ cython_debug/
 
 __pycache__/
 __pycache__/util.cpython-37.pyc
+metadata.txt
+.gitignore

@@ -34,9 +34,12 @@ def closest_vector_handler(h1, h2, n=.25):
         if idx1 == pair_idx:
             heap.append( (score, h1['xys'][idx1], h2['xys'][idx]) )
 
-    if n > 0 and n < 1:
-        n = math.ceil(n * len(heap))
-    return heapq.nsmallest(n, heap, key=lambda x: x[0])
+    if n > 0 and n <= 1:
+        return heapq.nsmallest(int(n* len(heap)), heap, key=lambda x: x[0])
+    elif n >= 1:
+        return heapq.nsmallest(int(n), heap, key=lambda x: x[0])
+    # Defaults to .25 proportion
+    return heapq.nsmallest(int(0.25* len(heap)), heap, key=lambda x: x[0])
 
 @njit
 def norm(v):
@@ -66,7 +69,8 @@ def closest(v1, M2, ans):
     ans[0] = closest_index
     ans[1] = closest_score
 
-def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
+# def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
+def remove_overflow_points(xys1, desc1, size1, xys2=None, desc2=None, size2=None):
     """
     Removes 'overflow' points, those whose radius exceeds the boundaries of the image.
 
@@ -79,14 +83,16 @@ def remove_overflow_points(xys1, xys2, desc1, desc2, size1, size2):
         if point1[0]+radius > size1[0] or point1[1]+radius > size1[1] or point1[0]-radius < 0 or point1[1]-radius < 0:
             if idx1 >= len(xys1): continue
             indices_to_be_del_1.append(idx1)
-    for idx2, point2 in enumerate(xys2):
-        radius = point2[2] / 2
-        if point2[0]+radius > size2[0] or point2[1]+radius > size2[1] or point2[0]-radius < 0 or point2[1]-radius < 0:
-            if idx2 >= len(xys2): continue
-            indices_to_be_del_2.append(idx2)
+    if xys2 is not None:
+        for idx2, point2 in enumerate(xys2):
+            radius = point2[2] / 2
+            if point2[0]+radius > size2[0] or point2[1]+radius > size2[1] or point2[0]-radius < 0 or point2[1]-radius < 0:
+                if idx2 >= len(xys2): continue
+                indices_to_be_del_2.append(idx2)
+        xys2 = np.delete(xys2, indices_to_be_del_2, 0)
+        desc2 = np.delete(desc2, indices_to_be_del_2, 0)
 
     xys1 = np.delete(xys1, indices_to_be_del_1, 0)
     desc1 = np.delete(desc1, indices_to_be_del_1, 0)
-    xys2 = np.delete(xys2, indices_to_be_del_2, 0)
-    desc2 = np.delete(desc2, indices_to_be_del_2, 0)
+    
     return xys1, xys2,desc1, desc2
