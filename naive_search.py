@@ -20,7 +20,7 @@ def compute_matches_for_image_across_hotels(hid, rid):
 
     # SAME HOTEL
     # Get a sample of images from the same hotel
-    same_hotel_rids = #TODO ask marshall
+    same_hotel_rids = #TODO marshall
     same_hotel_feature_lists = []
     for same_rid in same_hotel_rids:
         same_hotel_feature_lists.append(r2d2_features.open_and_extract_feature_file(hid, same_rid))
@@ -32,7 +32,7 @@ def compute_matches_for_image_across_hotels(hid, rid):
 
     # DIFFERENT HOTEL
     # Get a sample of images from a different hotel
-    # Initially, let's just do this for a single different hotel... could wrap in loop for a sample of the total hotels too though
+    # Initially, let's just do this for a single different hotel... could wrap in loop for a sample of the total hotels too though #TODO
     diff_hotel_id = #TODO marshall
     diff_hotel_rids = #TODO marshall
     diff_hotel_feature_lists = []
@@ -48,10 +48,4 @@ def compute_matches_for_image_across_hotels(hid, rid):
     # TODO decide best way to do so
 
     # Plot the distribution of cosine similarities for each class (hotel)
-    # TODO 
-
-"""
-# NOTES
-def closest_vector_handler(h1, h2,n):
-Computes and returns the n closest (by cosine distance) r2d2 points between h1 and h2.
-"""
+    # TODO check how this data is structured so we can quickly plot it
