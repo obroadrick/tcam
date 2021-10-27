@@ -8,6 +8,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Workspace file
+*.code-workspace
+
+
 # C extensions
 *.so
 
