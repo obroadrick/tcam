@@ -16,7 +16,7 @@ def compute_matches_for_image_across_hotels(hid, rid):
     rid     room id of the query image
     """
     # Get the query image features
-    query_img_features = r2d2_features.open_and_extract_feature_file(hotel_ids[0], room_ids[0])
+    query_img_features = r2d2_features.open_and_extract_feature_file(hid, rid)
 
     # SAME HOTEL
     # Get a sample of images from the same hotel
