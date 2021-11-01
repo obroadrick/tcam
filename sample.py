@@ -7,8 +7,8 @@ from util import open_pckl_file, write_pckl_5_file
 
 random.seed(42)
 
-def main(factor):
-    r2d2 = open_pckl_file('./r2d2_features.pckl')
+def main(factor, path):
+    r2d2 = open_pckl_file(path)
     hids = r2d2.get_hotel_ids()
     _, __, total = get_data(hids, r2d2)
 
@@ -29,6 +29,7 @@ def main(factor):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', type=str, required=True)
+    parser.add_argument('-p', type=str, required=True)
     args = parser.parse_args()
     factor = int(args.f)
-    main(factor=factor)
+    main(factor, args.p)

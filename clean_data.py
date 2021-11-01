@@ -5,10 +5,10 @@ from tqdm import tqdm
 from closeness_computations import remove_overflow_points
 from util import open_image, open_pckl_file, write_pckl_5_file
 
-R2D2_FEATS = open_pckl_file('./r2d2_features.pckl')
+R2D2_FEATS = open_pckl_file('./datasets/0.1k/r2d2_objs/unclean.pckl')
 hotel_ids = R2D2_FEATS.get_hotel_ids()
 
-dir = './datasets/0.1k/cleaned_0.1k/'
+dir = './datasets/0.1k/data/'
 
 for hotel in tqdm(hotel_ids):
     feature_file = R2D2_FEATS.open_and_extract_feature_file(hotel_id=hotel)

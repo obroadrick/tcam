@@ -1,0 +1,58 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "naive search",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "-d",
+                "datasets/0.1k/sampled_hotels/sampled_data_10_factor.pckl",
+                "-p",
+                "datasets/0.1k/r2d2_objs/clean.pckl"
+            ]
+        },
+        {
+            "name": "create feature obj",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "-p",
+                "/pless_nfs/home/datasets/tcam_local_features/small/",
+                "-s",
+                "./datasets/0.1k/r2d2_objs/",
+                "--fn",
+                "unclean.pckl"
+            ]
+        }
+        ,
+        {
+            "name": "sample",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "-p",
+                "./datasets/0.1k/r2d2_objs/clean.pckl",
+                "-f",
+                "10"
+            ]
+        }
+    ]
+}

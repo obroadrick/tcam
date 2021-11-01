@@ -19,7 +19,7 @@ def closest_vector_handler(h1, h2, n=.25):
     M1 = h1['desc']; M2 = h2['desc']
     M1 = M1.astype(np.float64)
     M2 = M2.astype(np.float64)
-    for idx1, v1 in tqdm(enumerate(M1), total=len(M1), desc='Finding Closest'):
+    for idx1, v1 in enumerate(M1):
         # array to hold answer. no return possible for this gpu shit
         ans = np.ones(128, dtype=np.float64)
         closest(v1, M2, ans)
@@ -39,7 +39,7 @@ def closest_vector_handler(h1, h2, n=.25):
     elif n >= 1:
         return heapq.nsmallest(int(n), heap, key=lambda x: x[0])
     # Defaults to .25 proportion
-    return heapq.nsmallest(int(0.25* len(heap)), heap, key=lambda x: x[0])
+    return heapq.nsmallest(int(n* len(heap)), heap, key=lambda x: x[0])
 
 @njit
 def norm(v):
