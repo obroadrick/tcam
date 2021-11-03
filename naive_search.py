@@ -7,7 +7,9 @@ from closeness_computations import closest_vector_handler
 from util import open_pckl_file
 
 from tqdm import tqdm
-from random import sample
+from random import sample, seed
+
+seed(42)
 """
 Functions for our initial, naive search that we will use to build an 
 understanding of how r2d2 points can be used for our matching problem.
@@ -40,7 +42,7 @@ def compute_matches_for_image_across_hotels(r2d2_features, hid, rid):
     # Compute the cosine similarities between the query image and sampled images from the same hotel
     same_hotel_matches = []
     for same_hotel_features in tqdm(same_hotel_feature_lists, total=len(same_hotel_feature_lists), desc='Computing Closest in Same Hotel'):
-       # print(closest_vector_handler(query_img_features, same_hotel_features, 1)[0])
+    # print(closest_vector_handler(query_img_features, same_hotel_features, 1)[0])
         same_hotel_matches.extend([1-i[0] for i in closest_vector_handler(query_img_features, same_hotel_features, 1)])
 
     # DIFFERENT HOTEL
@@ -53,11 +55,13 @@ def compute_matches_for_image_across_hotels(r2d2_features, hid, rid):
         if id != hid:
             diff_hotel_hids.append(id)
     diff_hotel_feature_lists = []
-    for idx, diff_hid in enumerate(diff_hotel_hids):
+    for idx, diff_hid in enumerate(list(sample(diff_hotel_hids, 100))):
         ff = r2d2_features.open_and_extract_feature_file(diff_hid)
-        
-        diff_hotel_feature_lists.extend(list(sample(list(ff.values()), 1))) 
+        diff_rid = int(sample(ff.keys(), 1)[0])
+        diff_hotel_feature_lists.append(ff[diff_rid])
+        #diff_hotel_feature_lists.extend(list(ff.values())) 
     # Compute the cosine similarities between the query image and sampled images from the diff hotel
+    # diff_hotel_feature_lists = list(sample(diff_hotel_features_list, 100)) 
     diff_hotel_matches = []
     for diff_hotel_features in tqdm(diff_hotel_feature_lists, total=len(diff_hotel_feature_lists), desc='Computing Closest in Diff Hotel'):
         diff_hotel_matches.extend([1-i[0] for i in closest_vector_handler(query_img_features, diff_hotel_features, 1)])
@@ -77,7 +81,10 @@ def compute_matches_for_image_across_hotels(r2d2_features, hid, rid):
 
     #plt.savefig('datasets/0.1k/naive_search_results/'+str(hid)+'_'+str(rid)+'.png')
     #plt.close()
+    plot(same_hotel_matches, diff_hotel_matches, hid, rid)
+    return same_hotel_matches, diff_hotel_matches
 
+def plot(same_hotel_matches, diff_hotel_matches, hid, rid):
     fig, ax = plt.subplots()
     for a in [(same_hotel_matches, 'same'), (diff_hotel_matches, 'diff')]:
         sns.distplot(a[0],label=a[1], bins=10, ax=ax, kde=True)
@@ -96,10 +103,12 @@ def main(path_to_r2d2):
     
     hids = r2d2.get_hotel_ids()
 
-    for hid in hids[1:]:
+    for hid in sample(hids, 100):
+        same, diff = [], []
         for rid in r2d2.get_room_ids(hid):
-            compute_matches_for_image_across_hotels(r2d2, hid, rid)
-
+           s, d = compute_matches_for_image_across_hotels(r2d2, hid, rid)
+        same, diff = same.extend(s), diff.extend(d)
+        plot(same, diff, hid, 'OVERALL')
 
 
 if __name__ == '__main__':

@@ -19,8 +19,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "-d",
-                "datasets/0.1k/sampled_hotels/sampled_data_10_factor.pckl",
                 "-p",
                 "datasets/0.1k/r2d2_objs/clean.pckl"
             ]

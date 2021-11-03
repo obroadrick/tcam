@@ -1,4 +1,5 @@
 # Pickle files
+.vscode/
 *.pckl
 *.pkl
 **/datasets
@@ -153,3 +154,4 @@ metadata.txt
 .gitignore
 __pycache__/R2D2Features.cpython-37.pyc
 __pycache__/util.cpython-37.pyc
+.vscode/launch.json

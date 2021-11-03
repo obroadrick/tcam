@@ -26,8 +26,11 @@ def write_pckl_file(path, data):
     with open(path, 'wb') as f:
         pickle.dump(data, f)
 
-def load_dir(path):
-    return list(glob.glob(path + "/*.*"))
+def load_dir(path, file_type=None):
+    if file_type is None:
+        return list(glob.glob(path + "/*.*"))
+    else:
+        return list(glob.glob(path + "/*."+file_type))
 
 
 def create_dirs(path):
