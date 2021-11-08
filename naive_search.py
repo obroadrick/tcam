@@ -10,6 +10,9 @@ from tqdm import tqdm
 from random import sample, seed
 
 seed(42)
+
+import warnings
+warnings.filterwarnings("ignore")
 """
 Functions for our initial, naive search that we will use to build an 
 understanding of how r2d2 points can be used for our matching problem.
@@ -36,6 +39,7 @@ def compute_matches_for_image_across_hotels(r2d2_features, hid, rid):
     same_hotel_rids = r2d2_features.get_room_ids(hid)
     same_hotel_feature_lists = []
     for same_rid in same_hotel_rids:
+        if same_rid == rid: continue
         same_hotel_feature_lists.append(r2d2_features.open_and_extract_feature_file(hid, same_rid))
     
     # Compute the cosine similarities between the query image and sampled images from the same hotel
@@ -63,22 +67,23 @@ def compute_matches_for_image_across_hotels(r2d2_features, hid, rid):
         diff_hotel_matches.extend([1-i[0] for i in closest_vector_handler(query_img_features, diff_hotel_features, 1)])
 
     # Save this data
-    dir = 'datasets/0.1k/naive_search_results/{}/'.format(hid)
-    array = np.array([same_hotel_matches, diff_hotel_matches])
+    dir = 'datasets/0.1k/naive_search_results_more_bins/{}/'.format(hid)
+    create_dirs(dir)
+    array = np.array([same_hotel_matches, diff_hotel_matches],dtype=object)
     np.save(dir+str(hid)+'_'+str(rid)+'.npy', array)
     plot(same_hotel_matches, diff_hotel_matches, hid, rid, dir)
     return same_hotel_matches, diff_hotel_matches
 
 def plot(same_hotel_matches, diff_hotel_matches, hid, rid, dir):
     fig, ax = plt.subplots()
-    for a in [(same_hotel_matches, 'same'), (diff_hotel_matches, 'diff')]:
-        sns.distplot(a[0],label=a[1], bins=10, ax=ax, kde=True)
     ax.set_xlim([0, 1])
+    for a in [(same_hotel_matches, 'same'), (diff_hotel_matches, 'diff')]:
+        sns.distplot(a[0],label=a[1], bins=100, ax=ax, kde=True, norm_hist=True)
     plt.title('HID={}; RID={}'.format(hid, rid))
     plt.legend()
     plt.savefig(dir+str(hid)+'_'+str(rid)+'.png')
-    plt.clear()	
-    
+    plt.close()
+
 """
 # NOTES
 def closest_vector_handler(h1, h2,n):
@@ -94,8 +99,9 @@ def main(path_to_r2d2):
         same, diff = [], []
         for rid in r2d2.get_room_ids(hid):
            s, d = compute_matches_for_image_across_hotels(r2d2, hid, rid)
-        same, diff = same.extend(s), diff.extend(d)
-        plot(same, diff, hid, 'OVERALL')
+        same.extend(s), diff.extend(d)
+        dir = 'datasets/0.1k/naive_search_results_more_bins/{}/'.format(hid)
+        plot(same, diff, hid, 'OVERALL', dir)
 
 
 if __name__ == '__main__':
