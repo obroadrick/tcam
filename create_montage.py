@@ -1,50 +1,36 @@
-import os
-import sys
-from time import strftime
-from PIL import Image, ImageDraw
-from util import load_dir
+from imutils import build_montages
+from imutils import paths
+import argparse
+import random
+import cv2
+from util import load_dir,create_dirs, save_image
 
-filenames = load_dir('./datasets/0.1k/naive_search_results', file_type='png')
-images = [Image.open(filename) for filename in filenames]
-row_size = 4
-margin = 3
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--images", required=True,
+	help="path to input directory of images")
+ap.add_argument("-s", "--sample", type=int, default=21,
+	help="# of images to sample")
+args = vars(ap.parse_args())
 
-width = 0
-height = 0
-i = 0
-sum_x = max_y = 0 
-width = max(image.size[1]+margin for image in images)*row_size
-height = sum(image.size[0]+margin for image in images)
 
-montage = Image.new(mode='RGBA', size=(width, height), color=(0,0,0,0))
+imagePaths = list(load_dir(args['images'], file_type='png'))
+random.shuffle(imagePaths)
 
-draw = ImageDraw.Draw(montage)
-offset_x = offset_y = 0
+# initialize the list of images
+images = []
+# loop over the list of image paths
+for imagePath in imagePaths:
+	# load the image and update the list of images
+	image = cv2.imread(imagePath)
+	images.append(image)
+# construct the montages for the images
+montages = build_montages(images, (128, 196), (7, 3))
 
-i = 0
-max_y = 0
-max_x = 0
-offset_x = 0
-for image in images:
-    montage.paste(image, (offset_x, offset_y))
+# loop over the montages and display each of them
+for montage in montages:
+	cv2.imshow("Montage", montage)
+	cv2.waitKey(0)
 
-    text_coords = offset_x + image.size[0] - 45, offset_y + 120
-    draw.text(text_coords, '#{0}'.format(i+1))
-
-    max_x = max(max_x, offset_x+image.size[0])
-    if i % row_size == row_size-1: 
-        offset_y += max_y+margin
-        max_y = 0
-        offset_x = 0
-    else:
-        offset_x += image.size[0]+margin
-        max_y = max(max_y, image.size[1])
-
-    i += 1
-
-if i % row_size:
-    offset_y += max_y
-
-filename = strftime("./datasets/0.1k/montages/Montage %Y-%m-%d at %H.%M.%S.png")
-montage = montage.crop((0, 0, max_x, offset_y))
-montage.save(filename)
+save_path = 'datasets/0.1k/naive_search_results_more_bins/38889/'
+create_dirs(save_path)
+montages[0].save(save_path+'montage.png')
