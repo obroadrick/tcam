@@ -7,6 +7,7 @@ import copy
 from PIL import Image, ImageDraw
 from random import randint
 
+
 def draw_closest_pairs_on_two_images(i1, i2, n_smallest, lines=True, circles=True):
      # Stitch images together, updating the n_smallest coordinates.
     image, n_smallest = stitch_images(i1, i2, n_smallest)
@@ -29,21 +30,33 @@ def draw_closest_pairs_on_two_images(i1, i2, n_smallest, lines=True, circles=Tru
 def closest_same_closest_diff(same_hotels, same_rooms, diff_hotels, diff_rooms):
     pass
 
-def draw_points(image, n_smallest):
+def draw_points(image, n_smallest, one_image=False):
     draw = ImageDraw.Draw(image)
 
     r = 5
     colors = []
-    for s in n_smallest:
-        point1, point2 = s[1][:2], s[2][:2]
-        color = (randint(0, 255), randint(0,255), randint(0,255))
-        circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
-        circle2 = (point2[0]-r, point2[1]-r, point2[0]+r, point2[1]+r)
 
-        draw.ellipse(circle1, fill=color)
-        draw.ellipse(circle2, fill=color)
+    if not one_image:
+        for s in n_smallest:
+            point1, point2 = s[1][:2], s[2][:2]
+            color = (randint(0, 255), randint(0,255), randint(0,255))
+            circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
+            circle2 = (point2[0]-r, point2[1]-r, point2[0]+r, point2[1]+r)
 
-        colors.append(color)
+            draw.ellipse(circle1, fill=color)
+            draw.ellipse(circle2, fill=color)
+
+            colors.append(color)
+    else:
+        r = 1
+        for s in n_smallest[:100]:
+            point1 = s
+            color = (randint(0, 255), randint(0,255), randint(0,255))
+            circle1 = (point1[0]-r, point1[1]-r ,point1[0]+r, point1[1]+r)
+
+            draw.ellipse(circle1, fill=color)
+
+            colors.append(color)
 
     return image, colors
 

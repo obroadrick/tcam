@@ -3,10 +3,10 @@ from random import choice, sample
 
 from util import create_dirs, open_pckl_file, save_image, save_to_csv
 from closeness_computations import closest_vector_handler, remove_overflow_points
-from visualization import draw_closest_pairs_on_two_images
+from visualization import draw_closest_pairs_on_two_images, draw_points
 from PIL import Image
 
-r2d2_features = open_pckl_file('r2d2_features.pckl')
+r2d2_features = open_pckl_file('datasets/0.1k/r2d2_objs/clean.pckl')
 
 def closest_n_vectors(h1, h2, i1, i2, n):
     """ 
@@ -18,11 +18,11 @@ def closest_n_vectors(h1, h2, i1, i2, n):
     i2 = Image.open(i2)
 
     # Exclude points where radius is over border of image.
-    # h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
-    #     h1['xys'], h1['desc'], i1.size, h2['xys'], h2['desc'], i2.size)
+    h1['xys'], h2['xys'], h1['desc'], h2['desc'] = remove_overflow_points(
+        h1['xys'], h1['desc'], i1.size, h2['xys'], h2['desc'], i2.size)
 
     # Find closest from each  h1 to closest in h2.
-    n_smallest = closest_vector_handler(h1, h2, 10)
+    n_smallest = closest_vector_handler(h1, h2, 100)
 
     # Draw a nice picture of these results
     lines = False
@@ -31,7 +31,34 @@ def closest_n_vectors(h1, h2, i1, i2, n):
 
     # Save.
     return image, n_smallest
- 
+
+def get_n_points(h, i, n):
+    """
+    Opens the image at path i, computes the n closest pairwise r2d2 point matches,
+    draws the points on the image and saves it.
+    """
+    i = Image.open(i)
+
+    # print(i)
+    print(h)
+    # n_closest = [point[:2] for point in h['xys']]
+
+    points_and_scores = []
+    for idx in range(len(h['xys'])):
+        points_and_scores.append([float(h['scores'][idx]), h['xys'][idx]])
+    points_and_scores.sort(key=lambda x: x[0])
+
+    n_closest = [point[1] for point in points_and_scores]
+
+    # h = sorted(h, key=lambda x: )
+    
+    # Find closest from each  h1 to closest in h2.
+    image, _ = draw_points(i, n_closest, one_image=True)
+
+    # Save.
+    create_dirs('./single-image/')
+    save_image('./single-image/', 'test-img-100.png', image)
+
 def compare_two(hotel_ids, room_ids):
     h1 = r2d2_features.open_and_extract_feature_file(hotel_ids[0], room_ids[0])
     h2 = r2d2_features.open_and_extract_feature_file(hotel_ids[1], room_ids[1])
@@ -43,9 +70,14 @@ def compare_two(hotel_ids, room_ids):
 
     save(hotel_ids, room_ids, stitched_image, n_smallest)
 
+def evaluate_image(hotel_id, room_id):
+    h = r2d2_features.open_and_extract_feature_file(hotel_id, room_id)
+    i = r2d2_features.get_path_to_image(hotel_id, room_id)
+    get_n_points(h, i, 100)
+
 def save(hotel_ids, room_ids, stitched_image, n_smallest):
     fn = str(hotel_ids[0])+'_'+str(room_ids[0]) +'_'+str(hotel_ids[1])+'_'+str(room_ids[1])
-    dir = '.' + os.path.basename(fn+'edge points')
+    dir = '.' + os.path.basename(fn+'-edge points')
     create_dirs(dir)
 
     save_image(dir, fn, stitched_image)
@@ -83,9 +115,12 @@ def main():
 
     # compare random two
     # hotel_ids, room_ids = get_random_hotel_rooms()
-    hotel_ids = ['6268', '6268']
-    room_ids = [7891968, 2618161]
-    compare_two(hotel_ids, room_ids)
+    # hotel_ids = ['6268', '6268']
+    # room_ids = [7891968, 2618161]
+    hotel_ids = '6268'
+    room_ids = 7891968
+    evaluate_image(hotel_ids, room_ids)
+    # compare_two(hotel_ids, room_ids)
     """
     hotel_ids, room_ids = get_same_hotels()
     compare_two(hotel_ids, room_ids)
