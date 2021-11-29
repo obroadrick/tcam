@@ -32,7 +32,7 @@ def closest_vector_handler(h1, h2, n=.25):
         # pair_idx, _= closest(M2[idx], M1)
 
         if idx1 == pair_idx:
-            heap.append( (score, h1['xys'][idx1], h2['xys'][idx]) )
+            heap.append( (score, h1['xys'][idx1], h2['xys'][idx], h1['scores'][idx1], h2['scores'][idx]) )
 
     if n > 0 and n <= 1:
         return heapq.nsmallest(int(n* len(heap)), heap, key=lambda x: x[0])
@@ -96,3 +96,74 @@ def remove_overflow_points(xys1, desc1, size1, xys2=None, desc2=None, size2=None
     desc1 = np.delete(desc1, indices_to_be_del_1, 0)
     
     return xys1, xys2,desc1, desc2
+
+# TPB = 16
+@cuda.jit(device=0)
+def gpu_closest_vector_handler(A, B, ans):
+    TPB = 32
+    bpg = (A.size + (TPB - 1))
+    sA = cuda.shared.array(shape=(TPB, TPB), dtype=float64)
+    sB = cuda.shared.array(shape=(TPB, TPB), dtype=float64)
+
+    x, y = cuda.grid(2)
+
+    tx = cuda.threadIdx.x
+    ty = cuda.threadIdx.y
+    # bpg = cuda.gridDim.x    # blocks per grid
+
+    if x >= ans.shape[0] and y >= ans.shape[1]:
+        # Quit if (x, y) is outside of valid C boundary
+        return
+
+    for i in range(bpg):
+        # Preload data into shared memory
+        sA[tx, ty] = A[x, ty + i * TPB]
+        for j in range(B.shape[0]):
+            sB[tx, ty] = B[x, ty + i * TPB]
+
+        # Wait until all threads finish preloading
+            cuda.syncthreads()
+
+            # Computes partial product on the shared memory
+            d = 0.
+            for k in range(TPB):
+                d += sA[tx, k] * sB[tx, k]
+
+            # Wait until all threads finish computing
+            cuda.syncthreads()
+            n_v1 = 0.
+            n_v2 = 0.
+
+            for k in range(TPB):
+                n_v1 += sA[tx, k]**2
+                n_v2 += sB[tx, k]**2
+            n_v1 = math.sqrt(n_v1)
+            n_v2 = math.sqrt(n_v2)
+
+            # Wait until all threads finish computing
+            cuda.syncthreads()
+
+            cos_sim = 1 - (d / (n_v1*n_v2))
+            ans[i, j] = cos_sim
+
+    # for i in prange(len(query_features)):
+    #     for j in prange(len(search_features)):
+    #         v1 = query_features[i]
+    #         v2 = search_features[j]
+
+    #         d = 0
+    #         for k in prange(len(v1)):
+    #             d += v1[k] * v2[k]
+
+    #         norm_v1 = 0
+    #         norm_v2 = 0
+    #         for k in prange(len(v1)):
+    #             norm_v1 +=v1[k]**2
+    #             norm_v2 +=v2[k]**2
+    #         norm_v1 = math.sqrt(norm_v1)
+    #         norm_v2 = math.sqrt(norm_v2)
+
+    #         # score = 1- (dot(v1,v2)/ (norm(v1) * norm(v2)))
+    #         cos_dist = 1 - (d / (norm_v1 * norm_v2))
+    #         ans[i][j] = cos_dist
+

@@ -47,7 +47,7 @@ class R2D2Features:
             hotel_feature_data = open_pckl_5_file(hotel_feature_file)[room_id]
         else:
             hotel_feature_data = open_pckl_5_file(hotel_feature_file)
-
+        # print(hotel_feature_data)
         return hotel_feature_data
 
     def get_path_to_image(self, hotel_id, room_id):
