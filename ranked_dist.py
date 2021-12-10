@@ -1,7 +1,8 @@
 import numpy as np
 from util import load_dir
 
-
+tot_same = 0
+tot_diff = 0
 def gen_closeness_rankings(path):
     # Load in a single npy file 
     # (which contains two lists, one for similarities in the same hotel and 
@@ -10,7 +11,10 @@ def gen_closeness_rankings(path):
     similarities = np.load(path, allow_pickle=True)
     same_similarities = similarities[0]
     diff_similarities = similarities[1]
-    
+    global tot_same
+    global tot_diff
+    tot_same+= len(same_similarities)
+    tot_diff+= len(diff_similarities)
     combined_similarities = [(float(s), 1) for s in same_similarities]
     combined_similarities.extend( [(float(d), 0) for d in diff_similarities] )
     combined_similarities.sort(key=lambda x: x[0], reverse=True)
@@ -31,9 +35,14 @@ query_rid = ' '
 similarities = []
 for idx, file in enumerate(hotel_np_files):
     similarities.append(gen_closeness_rankings(file))
-
+print(tot_same)
+print(tot_diff)
+avg = tot_same / len(hotel_np_files)
+print(avg)
+print((tot_same-avg)/tot_diff)
 # find avg occurrences of same hotel in top n (for lowish n) similarities
-print('HID=18470')
+print('HID=38889')
+a = []
 for n in range(1,25+1):
     proportions = []
     for idx, simils in enumerate(similarities):
@@ -49,6 +58,8 @@ for n in range(1,25+1):
         proportions.append(tot / n)
 
     print('n={}, avg={}'.format(n, sum(proportions) / len(proportions)) )
+    a.append(sum(proportions) / len(proportions))
+print(a)
 
 
 
