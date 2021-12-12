@@ -1,7 +1,17 @@
+"""
+Now that we have generated all this label data, let's explore it a bit.
+Some questions we'd like to answer:
+- What is the distribution of c_same?
+- What is the distribution of c_diff?
+- What is the distribution of their ratio?
+- Where do the mean, median, and other quantiles lie for the ratio distribution?
+- Are the results consistent with what we would expect, or have we revealed something new?
+"""
+
+import matplotlib.pyplot as plt
 import numpy as np
 from util import open_pckl_file, load_dir
 
-# hotels = np.load('datasets/0.1k/datasets/same_diff_hotel/141527.npy', allow_pickle=True)[0]
 # hotels = open_pckl_file('datasets/0.1k/datasets/same_diff_hotel/38889.pckl')
 # hotels = open_pckl_file('datasets/0.1k/datasets/same_diff_hotel/38889.pckl')
 # # same/diff, query_points, query_point, (distance, descriptor, xys, hid, iid)

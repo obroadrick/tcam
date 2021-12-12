@@ -16,7 +16,7 @@ hotel_ids = R2D2.get_hotel_ids()
 # Sample 10 random hotels uniformly
 hotel_ids = random.sample(hotel_ids, 10)
 
-# Sample *all* images (let's not miss the painting or nice angle of lamp)
+# Sample *all* images (let's not miss the painting or nice angle of lamp in one of them)
 proportion_of_points_to_sample = .25
 sample = {}
 for hid in tqdm(hotel_ids):
